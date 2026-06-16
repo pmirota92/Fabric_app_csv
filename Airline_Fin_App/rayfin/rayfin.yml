@@ -1,0 +1,23 @@
+id: airline-fin-app
+name: Airline_Fin_App
+version: 1.0.0
+services:
+  auth:
+    enabled: true
+    fabric:
+      enabled: true
+    allowedRedirectUris:
+      - http://localhost:5173
+      - https://fast-inlet-fc4bc428a2-westeurope.webapp.fabricapps.net
+  data:
+    enabled: false
+  storage:
+    enabled: false
+  staticHosting:
+    enabled: true
+    root: .
+    folder: dist
+    buildCommand: npm run build
+    indexDocument: index.html
+  functions:
+    enabled: false
