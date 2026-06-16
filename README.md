@@ -51,7 +51,8 @@ Choosing the right tool depends on your data strategy and the required user expe
 
 * **Tenant Isolation:** The application runs strictly within your organization's Microsoft Fabric tenant and dedicated capacity. It is completely isolated from third-party SaaS environments.
 * **Access Control:** Enforces native Microsoft Entra ID SSO, fully supporting corporate policies like Conditional Access, Role-Based Access Control (RBAC), and Microsoft Purview sensitivity labels.
-* **⚠️ Critical Data Security Note:** This current version bundles the raw CSV file into the static frontend assets. This means **the source file is technically downloadable by any user authorized to access the app.** * *For Non-Sensitive Data:* This architecture is perfectly acceptable.
+* **⚠️ Critical Data Security Note:** This current version bundles the raw CSV file into the static frontend assets. This means **the source file is technically downloadable by any user authorized to access the app.**
+  * *For Non-Sensitive Data:* This architecture is perfectly acceptable.
   * *For Confidential Financial Data:* Do **not** place sensitive CSVs in the `public/` directory. Instead, enable the Rayfin data service to host the data securely in OneLake, utilizing a secure backend API to serve only aggregated, pre-filtered results to the frontend.
 * **Repository Hygiene:** Always keep `rayfin/.env` and production datasets out of source control by verifying they are included in your `.gitignore` file.
 
@@ -83,6 +84,64 @@ npm install -D @types/papaparse
 
 # Launch the local development server
 npm run dev
+```
+
+### 3. Data Integration
+* Drop your financial source dataset into `public/data/`.
+* Configure and map your specific CSV column schemas inside `src/App.tsx`.
+* Build and refine your KPIs, charts, and slicers.
+
+### 4. Deploying to Microsoft Fabric
+When you are ready to publish the application to production, run the deployment pipeline via the Rayfin CLI:
+
+```bash
+npx rayfin login                 # Interactive browser authentication
+npx rayfin up switch --list      # Display available workspaces
+npx rayfin up switch <workspace> # Set your target workspace
+npx rayfin up --dry-run --verbose# Run a pre-flight deployment check
+npx rayfin up                    # Execute production deployment
+npx rayfin up status             # Fetch the live application production URL
+```
+
+> 💡 **Pro-Tip:** For subsequent frontend-only updates (CSS/UI changes), accelerate the deployment process by running:
+> `npx rayfin up staticapp deploy`
+
+---
+
+## 📁 Project Structure
+
+```text
+airline-impact/
+├── rayfin/
+│   ├── rayfin.yml      # Service architecture & deployment configuration
+│   └── .env            # Local environment variables (Never commit to Git)
+├── public/
+│   └── data/           # Storage folder for the source financial CSV
+├── src/
+│   ├── App.tsx         # Core Application: Data parsing, KPIs, and Visuals
+│   └── App.css         # Application custom styles
+├── .gitignore
+└── README.md
+```
+
+---
+
+## 🛠️ Quick Command Reference
+
+| Action / Goal | Command |
+| :--- | :--- |
+| **Scaffold Project** | `npm create @microsoft/rayfin@latest -- airline-impact --workspace <ws>` |
+| **Install Dependencies** | `npm install papaparse recharts && npm i -D @types/papaparse` |
+| **Start Local Environment** | `npm run dev` |
+| **Authenticate CLI** | `npx rayfin login` |
+| **Switch Workspace Target** | `npx rayfin up switch <ws>` |
+| **Pre-deployment Check** | `npx rayfin up --dry-run --verbose` |
+| **Full Project Deploy** | `npx rayfin up` |
+| **Fast UI-Only Deploy** | `npx rayfin up staticapp deploy` |
+| **Check Live App Status** | `npx rayfin up status` |
+
+---
+*Powered by Microsoft Fabric & Rayfin Framework (Preview).*
 
 *Built with Microsoft Fabric + Rayfin (preview). Charts: recharts. CSV parsing:
 papaparse.*
